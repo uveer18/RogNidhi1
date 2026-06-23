@@ -3,7 +3,17 @@ import re
 from groq import Groq
 import logging
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+_client = None
+
+def _get_client():
+    global _client
+    if _client is None:
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("GROQ_API_KEY is not set.")
+        _client = Groq(api_key=api_key)
+    return _client
+
 logger = logging.getLogger(__name__)
 
 def clean_number(val_str: str):
@@ -90,7 +100,8 @@ Output format:
 - NOTE: [Disclaimer about seeing a doctor]
 """
     try:
-        response = client.chat.completions.create(
+        g_client = _get_client()
+        response = g_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2
@@ -126,7 +137,8 @@ Output format:
 - RECOMMENDATION: [Next steps like 'Correlate clinically' or 'Follow-up tests']
 """
     try:
-        response = client.chat.completions.create(
+        g_client = _get_client()
+        response = g_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.1 
@@ -198,7 +210,8 @@ No markdown. No bold text.
     messages.append({"role": "user", "content": question})
 
     try:
-        response = client.chat.completions.create(
+        g_client = _get_client()
+        response = g_client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=messages,
             temperature=0.2

@@ -4,7 +4,16 @@ import logging
 from groq import Groq
 
 logger = logging.getLogger(__name__)
-_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+_client = None
+
+def _get_client():
+    global _client
+    if _client is None:
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("GROQ_API_KEY is not set.")
+        _client = Groq(api_key=api_key)
+    return _client
 
 def evaluate_rag_response(question: str, context: str, answer: str) -> dict:
     """
@@ -57,7 +66,8 @@ Output your evaluation in JSON format. Do not include any explanation, markdown 
 """
 
     try:
-        response = _client.chat.completions.create(
+        client = _get_client()
+        response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.0,

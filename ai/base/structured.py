@@ -6,8 +6,26 @@ from groq import Groq
 
 logger = logging.getLogger(__name__)
 
-gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+_gemini_client = None
+_groq_client = None
+
+def _get_gemini_client():
+    global _gemini_client
+    if _gemini_client is None:
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY is not set.")
+        _gemini_client = genai.Client(api_key=api_key)
+    return _gemini_client
+
+def _get_groq_client():
+    global _groq_client
+    if _groq_client is None:
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("GROQ_API_KEY is not set.")
+        _groq_client = Groq(api_key=api_key)
+    return _groq_client
 
 def build_prompt(text: str, context_hint: str = "", uploaded_date: str = None) -> str:
     prior_block = ""
@@ -69,7 +87,8 @@ def extract_with_gemini(text: str, model_name: str, context_hint: str = "", uplo
     logger.info(f"Attempting JSON extraction using {model_name}...")
     prompt = build_prompt(text, context_hint, uploaded_date)
     try:
-        response = gemini_client.models.generate_content(
+        client = _get_gemini_client()
+        response = client.models.generate_content(
             model=model_name,
             contents=prompt,
             config={"temperature": 0.1, "response_mime_type": "application/json"}
@@ -97,7 +116,8 @@ def extract_with_groq(text: str, context_hint: str = "", uploaded_date: str = No
     prompt = build_prompt(text, context_hint, uploaded_date)
     
     try:
-        response = groq_client.chat.completions.create(
+        client = _get_groq_client()
+        response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "You are a medical data extractor. Output ONLY valid JSON matching the exact schema."},

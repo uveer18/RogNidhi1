@@ -6,7 +6,16 @@ from .index_store import search_index
 from .grader import grade_relevance
 
 logger = logging.getLogger(__name__)
-_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+_client = None
+
+def _get_client():
+    global _client
+    if _client is None:
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            raise ValueError("GROQ_API_KEY is not set.")
+        _client = Groq(api_key=api_key)
+    return _client
 
 #SHARED
 _PERSONA = """You are RogNidhi, a warm and clinically careful health assistant.
@@ -32,7 +41,8 @@ def _build_context_block(retrieved: list[dict]) -> str:
 
 def _generate(messages: list[dict]) -> str:
     try:
-        resp = _client.chat.completions.create(
+        client = _get_client()
+        resp = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=messages,
             temperature=0.2,
