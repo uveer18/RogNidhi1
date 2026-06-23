@@ -22,6 +22,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-d2$w)%q%*!f-6yroi&qs2
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+if '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1', '[::1]', '.onrender.com'])
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
