@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../config";
 
 // ─── CONSTANTS ────────────────────────────────────────────────
-const API_BASE = "http://127.0.0.1:8000/api";
+const API_BASE = `${API_BASE_URL}/api`;
 
 const COLORS = {
   navy:      "#0A1628",

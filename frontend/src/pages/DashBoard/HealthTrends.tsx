@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
+import { API_BASE_URL } from "../../config";
 import {
   LineChart, Line, BarChart, Bar, RadarChart, Radar, PolarGrid,
   PolarAngleAxis, PolarRadiusAxis, ScatterChart, Scatter, XAxis, YAxis,
@@ -281,7 +282,7 @@ const HealthTrends: React.FC = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("access");
-      const res = await fetch("http://127.0.0.1:8000/api/records/chart-data/", {
+      const res = await fetch(`${API_BASE_URL}/api/records/chart-data/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) setDocs(await res.json());

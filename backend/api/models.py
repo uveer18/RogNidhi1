@@ -397,6 +397,7 @@ class ChatMessage(models.Model):
     )
     sender = models.CharField(max_length=20, choices=[('user', 'User'), ('ai', 'AI')])
     text = models.TextField()
+    eval_metrics = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

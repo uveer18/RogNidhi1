@@ -365,8 +365,9 @@ class ChatSessionMessageView(APIView):
         if chat_history and chat_history[-1]['role'] == 'user' and chat_history[-1]['content'] == question:
             chat_history.pop()
             
+        eval_metrics = None
         try:
-            ans = chat_with_rognidhi(
+            ans, eval_metrics = chat_with_rognidhi(
                 medical_data=medical_data,
                 chat_history=chat_history,
                 new_question=question,
@@ -374,8 +375,9 @@ class ChatSessionMessageView(APIView):
             )
         except Exception as e:
             ans = "I'm having trouble analyzing your request right now. Please try again."
+            eval_metrics = None
 
-        ChatMessage.objects.create(session=session, sender='ai', text=ans)
+        ChatMessage.objects.create(session=session, sender='ai', text=ans, eval_metrics=eval_metrics)
 
         serializer = ChatSessionSerializer(session)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

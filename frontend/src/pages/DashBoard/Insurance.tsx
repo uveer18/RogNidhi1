@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import { CreditCard, ShieldCheck, Zap, HeartPulse, CheckSquare, Search, ArrowRight, Globe, Activity } from "lucide-react";
 import { motion } from "framer-motion";
+import { API_BASE_URL } from "../../config";
 
 const COLORS = {
   navy: "#0A1628",
@@ -83,7 +84,7 @@ const Insurance: React.FC = () => {
     setIsScraping(true);
     try {
       const token = localStorage.getItem("access");
-      const res = await fetch("http://127.0.0.1:8000/api/schemes/scrape/", {
+      const res = await fetch(`${API_BASE_URL}/api/schemes/scrape/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {

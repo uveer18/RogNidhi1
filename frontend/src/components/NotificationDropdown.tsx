@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell, CheckSquare, BellRing } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_BASE_URL } from '../config';
 
 const COLORS = {
   navy: "#0A1628",
@@ -54,7 +55,7 @@ export default function NotificationDropdown() {
     try {
       const token = localStorage.getItem("access");
       if (!token) return;
-      const res = await fetch("http://127.0.0.1:8000/api/notifications/", {
+      const res = await fetch(`${API_BASE_URL}/api/notifications/`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {
@@ -96,7 +97,7 @@ export default function NotificationDropdown() {
     e.stopPropagation();
     try {
       const token = localStorage.getItem("access");
-      await fetch(`http://127.0.0.1:8000/api/notifications/${id}/read/`, {
+      await fetch(`${API_BASE_URL}/api/notifications/${id}/read/`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` }
       });

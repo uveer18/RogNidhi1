@@ -78,7 +78,7 @@ def chat_with_rognidhi(
     chat_history: list,
     new_question: str,
     patient_id: str | int | None = None,
-) -> str:
+) -> tuple[str, dict | None]:
     """
     Main chat entry point.
 
@@ -86,7 +86,7 @@ def chat_with_rognidhi(
     Falls back to direct LLM if patient_id is missing (graceful degradation).
     """
     if not new_question:
-        return "Please ask a question."
+        return "Please ask a question.", None
 
     try:
         if patient_id is not None:
@@ -108,11 +108,17 @@ def chat_with_rognidhi(
             logger.info("No patient_id provided — using legacy ask_rognidhi path.")
             from .base.chat import ask_rognidhi
             recent_history = chat_history[-6:] if chat_history else []
-            return ask_rognidhi(medical_data, new_question, recent_history)
+            ans = ask_rognidhi(medical_data, new_question, recent_history)
+            
+            # Evaluate fallback path if medical_data is available
+            from .rag.eval import evaluate_rag_response
+            context_str = str(medical_data) if medical_data else ""
+            eval_metrics = evaluate_rag_response(new_question, context_str, ans)
+            return ans, eval_metrics
 
     except Exception as e:
         logger.error(f"Chat Error: {e}")
-        return "I'm having trouble analyzing your report right now. Please try again."
+        return "I'm having trouble analyzing your report right now. Please try again.", None
     
 
 def get_doctor_brief(medical_data: list) -> str:

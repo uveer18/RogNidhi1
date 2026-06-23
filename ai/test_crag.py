@@ -26,10 +26,15 @@ logging.basicConfig(
 # Load .env from the ai/ directory
 from pathlib import Path
 env_path = Path(__file__).parent / ".env"
+root_env_path = Path(__file__).parent.parent / ".env"
 if env_path.exists():
     from dotenv import load_dotenv
     load_dotenv(env_path)
     print(f"✅ Loaded .env from {env_path}")
+elif root_env_path.exists():
+    from dotenv import load_dotenv
+    load_dotenv(root_env_path)
+    print(f"✅ Loaded .env from {root_env_path}")
 
 # Make sure ai/ is importable as a package
 ROOT = Path(__file__).resolve().parent.parent
@@ -177,9 +182,11 @@ def test_corrective_rag():
 
     for label, q in questions:
         print(f"\n  [{label}] Q: {q}")
-        ans = corrective_rag(TEST_PATIENT_ID, q, chat_history=history, top_k=5)
+        ans, eval_metrics = corrective_rag(TEST_PATIENT_ID, q, chat_history=history, top_k=5)
         print(f"  A: {ans[:180].replace(chr(10), ' ')}...")
+        print(f"  Eval: {eval_metrics}")
         assert isinstance(ans, str) and len(ans) > 5, "Empty/invalid answer"
+        assert isinstance(eval_metrics, dict), "Evaluation metrics should be a dictionary"
 
     print(f"\n  {PASS}")
 
@@ -196,14 +203,16 @@ def test_chat_entry_point():
 
     q = "My haemoglobin was 10.2 last time. Is that a concern?"
     print(f"  Q: {q}")
-    ans = chat_with_rognidhi(
+    ans, eval_metrics = chat_with_rognidhi(
         medical_data=medical_data,
         chat_history=history,
         new_question=q,
         patient_id=TEST_PATIENT_ID,
     )
     print(f"  A: {ans[:250].replace(chr(10), ' ')}...")
+    print(f"  Eval: {eval_metrics}")
     assert isinstance(ans, str) and len(ans) > 10
+    assert isinstance(eval_metrics, dict), "Evaluation metrics should be a dictionary"
     print(f"\n  {PASS}")
 
 

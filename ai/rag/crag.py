@@ -98,7 +98,7 @@ def corrective_rag(
     question: str,
     chat_history: list | None = None,
     top_k: int = 5,
-) -> str:
+) -> tuple[str, dict]:
     """
     Full Corrective RAG pipeline.
 
@@ -109,7 +109,7 @@ def corrective_rag(
         top_k:        Number of chunks to retrieve from FAISS.
 
     Returns:
-        Answer string.
+        Tuple of (Answer string, eval_metrics dict).
     """
     history = chat_history or []
 
@@ -124,8 +124,12 @@ def corrective_rag(
     context = _build_context_block(retrieved)
 
     if grade == "RELEVANT":
-        return _answer_relevant(question, context, history)
+        ans = _answer_relevant(question, context, history)
     elif grade == "PARTIAL":
-        return _answer_partial(question, context, history)
+        ans = _answer_partial(question, context, history)
     else:  
-        return _answer_irrelevant(question, history)
+        ans = _answer_irrelevant(question, history)
+
+    from .eval import evaluate_rag_response
+    eval_metrics = evaluate_rag_response(question, context, ans)
+    return ans, eval_metrics

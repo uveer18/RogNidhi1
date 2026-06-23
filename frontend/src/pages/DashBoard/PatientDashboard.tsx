@@ -10,6 +10,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from '../../components/Sidebar';
 import NotificationDropdown from "../../components/NotificationDropdown";
+import { API_BASE_URL } from "../../config";
 
 const COLORS = {
   navy: "#0A1628",
@@ -77,7 +78,7 @@ const PatientDashboard: React.FC = () => {
   const fetchRecords = async () => {
     try {
       const token = localStorage.getItem("access");
-      const response = await fetch("http://127.0.0.1:8000/api/records/timeline/", {
+      const response = await fetch(`${API_BASE_URL}/api/records/timeline/`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (response.ok) {
@@ -95,7 +96,7 @@ const PatientDashboard: React.FC = () => {
 
     try {
       const token = localStorage.getItem("access");
-      const response = await fetch(`http://127.0.0.1:8000/api/documents/delete/${id}/`, {
+      const response = await fetch(`${API_BASE_URL}/api/documents/delete/${id}/`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -143,7 +144,7 @@ const PatientDashboard: React.FC = () => {
 
     try {
       const token = localStorage.getItem("access");
-      const response = await fetch("http://127.0.0.1:8000/api/documents/upload/", {
+      const response = await fetch(`${API_BASE_URL}/api/documents/upload/`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` },
         body: formData,

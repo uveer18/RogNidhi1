@@ -24,13 +24,13 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
   // Paths here must match the "path" prop in App.tsx exactly
   const NAV_ITEMS = [
     { 
-      path: role === "doctor" ? "/Dashboard/DoctorDashboard" : "/Dashboard/PatientDashboard", 
+      path: role === "doctor" ? "/DashBoard/DoctorDashboard" : "/DashBoard/PatientDashboard", 
       label: "Timeline", 
       icon: Clock 
     },
-    { path: "/Dashboard/HealthTrends", label: "Health Trends", icon: TrendingUp },
+    { path: "/DashBoard/HealthTrends", label: "Health Trends", icon: TrendingUp },
     { 
-      path: "/Dashboard/RogNidhiHistory", 
+      path: "/DashBoard/RogNidhiHistory", 
       label: "RogNidhi History", 
       icon: Share2 
     },
@@ -40,8 +40,8 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
       icon: ShieldCheck 
     },
     ...(role !== "doctor" ? [
-      { path: "/Dashboard/LinkABHA", label: "Link ABHA", icon: Link },
-      { path: "/Dashboard/Insurance", label: "Insurance", icon: CreditCard },
+      { path: "/DashBoard/LinkABHA", label: "Link ABHA", icon: Link },
+      { path: "/DashBoard/Insurance", label: "Insurance", icon: CreditCard },
     ] : [])
   ];
 

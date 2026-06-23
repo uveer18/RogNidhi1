@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Send, Loader2, Bot, User as UserIcon,
-  Trash2, Edit2, Plus, MessageSquare, Paperclip, X, CheckCircle2, AlertCircle,
+  Trash2, Edit2, Plus, MessageSquare, Paperclip, X, CheckCircle2, AlertCircle, Sparkles,
 } from "lucide-react";
 import Sidebar from "../../components/Sidebar";
 import NotificationDropdown from "../../components/NotificationDropdown";
+import { API_BASE_URL } from "../../config";
 
 const COLORS = {
   navy:        "#0A1628",
@@ -28,6 +29,12 @@ interface Message {
   text: string;
   fileUrl?: string;
   fileName?: string;
+  eval_metrics?: {
+    context_relevance?: number;
+    faithfulness?: number;
+    answer_relevance?: number;
+    overall_accuracy?: number;
+  };
 }
 
 interface ChatSession {
@@ -78,7 +85,7 @@ const RogNidhiHistory: React.FC = () => {
   const fetchSessions = async () => {
     try {
       const token = localStorage.getItem("access");
-      const res = await fetch("http://127.0.0.1:8000/api/chat/sessions/", {
+      const res = await fetch(`${API_BASE_URL}/api/chat/sessions/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -108,7 +115,7 @@ const RogNidhiHistory: React.FC = () => {
     setActiveSessionId(sessionId);
     try {
       const token = localStorage.getItem("access");
-      const res = await fetch(`http://127.0.0.1:8000/api/chat/sessions/${sessionId}/`, {
+      const res = await fetch(`${API_BASE_URL}/api/chat/sessions/${sessionId}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -133,7 +140,7 @@ const RogNidhiHistory: React.FC = () => {
     const token = localStorage.getItem("access");
     try {
       if (targetId === "new") {
-        const res = await fetch("http://127.0.0.1:8000/api/chat/sessions/", {
+        const res = await fetch(`${API_BASE_URL}/api/chat/sessions/`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ title: newMsg.text.slice(0, 32) + "…" }),
@@ -145,7 +152,7 @@ const RogNidhiHistory: React.FC = () => {
           setSessions(prev => [data, ...prev.filter(s => s.id !== "new")]);
         }
       }
-      const res = await fetch(`http://127.0.0.1:8000/api/chat/sessions/${targetId}/`, {
+      const res = await fetch(`${API_BASE_URL}/api/chat/sessions/${targetId}/`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ question: newMsg.text }),
@@ -180,7 +187,7 @@ const RogNidhiHistory: React.FC = () => {
 
     try {
       const token = localStorage.getItem("access");
-      const res = await fetch("http://127.0.0.1:8000/api/documents/upload/", {
+      const res = await fetch(`${API_BASE_URL}/api/documents/upload/`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -220,7 +227,7 @@ const RogNidhiHistory: React.FC = () => {
     if (!window.confirm("Delete this chat session?")) return;
     try {
       const token = localStorage.getItem("access");
-      const res = await fetch(`http://127.0.0.1:8000/api/chat/sessions/${id}/`, {
+      const res = await fetch(`${API_BASE_URL}/api/chat/sessions/${id}/`, {
         method: "DELETE", headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -238,7 +245,7 @@ const RogNidhiHistory: React.FC = () => {
     if (!window.confirm("Delete all chat history?")) return;
     try {
       const token = localStorage.getItem("access");
-      const res = await fetch("http://127.0.0.1:8000/api/chat/sessions/", {
+      const res = await fetch(`${API_BASE_URL}/api/chat/sessions/`, {
         method: "DELETE", headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) { setSessions([]); setMessages([]); setActiveSessionId(null); }
@@ -257,7 +264,7 @@ const RogNidhiHistory: React.FC = () => {
     if (id === "new" || !editingTitle.trim()) { setEditingId(null); return; }
     try {
       const token = localStorage.getItem("access");
-      const res = await fetch(`http://127.0.0.1:8000/api/chat/sessions/${id}/`, {
+      const res = await fetch(`${API_BASE_URL}/api/chat/sessions/${id}/`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ title: editingTitle }),
@@ -494,22 +501,88 @@ const RogNidhiHistory: React.FC = () => {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.18, ease }}
-                    style={{ display: "flex", gap: 11, flexDirection: msg.sender === "user" ? "row-reverse" : "row", alignItems: "flex-end" }}
+                    style={{ display: "flex", gap: 11, flexDirection: msg.sender === "user" ? "row-reverse" : "row", alignItems: "flex-start" }}
                   >
-                    <div style={{ width: 28, height: 28, borderRadius: "50%", flexShrink: 0, background: msg.sender === "user" ? COLORS.navy : COLORS.tealLight, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 28, height: 28, borderRadius: "50%", flexShrink: 0, background: msg.sender === "user" ? COLORS.navy : COLORS.tealLight, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4 }}>
                       {msg.sender === "user" ? <UserIcon size={13} color="#fff" /> : <Bot size={13} color={COLORS.teal} />}
                     </div>
-                    <div style={{
-                      maxWidth: "70%", padding: "12px 16px", fontSize: 14, lineHeight: 1.65,
-                      borderRadius: msg.sender === "user" ? "14px 4px 14px 14px" : "4px 14px 14px 14px",
-                      background: msg.sender === "user" ? COLORS.navy : COLORS.white,
-                      color: msg.sender === "user" ? "#fff" : COLORS.navy,
-                      border: msg.sender === "user" ? "none" : `1px solid ${COLORS.border}`,
-                      boxShadow: msg.sender === "user" ? "0 3px 10px rgba(10,22,40,0.13)" : "0 2px 6px rgba(0,0,0,0.03)",
-                    }}>
-                      {msg.text.split("\n").map((line, i, arr) => (
-                        <React.Fragment key={i}>{line}{i < arr.length - 1 && <br />}</React.Fragment>
-                      ))}
+                    <div style={{ display: "flex", flexDirection: "column", maxWidth: "70%", alignItems: msg.sender === "user" ? "flex-end" : "flex-start" }}>
+                      <div style={{
+                        padding: "12px 16px", fontSize: 14, lineHeight: 1.65,
+                        borderRadius: msg.sender === "user" ? "14px 4px 14px 14px" : "4px 14px 14px 14px",
+                        background: msg.sender === "user" ? COLORS.navy : COLORS.white,
+                        color: msg.sender === "user" ? "#fff" : COLORS.navy,
+                        border: msg.sender === "user" ? "none" : `1px solid ${COLORS.border}`,
+                        boxShadow: msg.sender === "user" ? "0 3px 10px rgba(10,22,40,0.13)" : "0 2px 6px rgba(0,0,0,0.03)",
+                      }}>
+                        {msg.text.split("\n").map((line, i, arr) => (
+                          <React.Fragment key={i}>{line}{i < arr.length - 1 && <br />}</React.Fragment>
+                        ))}
+                      </div>
+
+                      {msg.sender === 'ai' && msg.eval_metrics && (
+                        <div style={{
+                          marginTop: 8,
+                          padding: '10px 14px',
+                          borderRadius: 8,
+                          background: 'rgba(0, 201, 167, 0.04)',
+                          border: '1px dashed rgba(0, 201, 167, 0.25)',
+                          fontSize: '11px',
+                          color: COLORS.navy,
+                          width: '100%',
+                          minWidth: 260,
+                          boxSizing: 'border-box',
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                            <span style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5, fontSize: 12 }}>
+                              <Sparkles size={12} color={COLORS.teal} />
+                              Retrieval & Generation Accuracy
+                            </span>
+                            <span style={{
+                              fontWeight: 800,
+                              fontSize: 11,
+                              color: msg.eval_metrics.overall_accuracy && msg.eval_metrics.overall_accuracy >= 80 ? COLORS.teal : '#D97706',
+                              background: msg.eval_metrics.overall_accuracy && msg.eval_metrics.overall_accuracy >= 80 ? 'rgba(0, 201, 167, 0.12)' : 'rgba(217, 119, 6, 0.12)',
+                              padding: '2px 7px',
+                              borderRadius: 4,
+                            }}>
+                              {msg.eval_metrics.overall_accuracy}% Match
+                            </span>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: 14, marginTop: 8, color: COLORS.muted }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                                <span>Retrieval Relevance</span>
+                                <span style={{ fontWeight: 600 }}>{msg.eval_metrics.context_relevance}%</span>
+                              </div>
+                              <div style={{ height: 4, background: 'rgba(0,0,0,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${msg.eval_metrics.context_relevance}%`, background: COLORS.teal, borderRadius: 2 }} />
+                              </div>
+                            </div>
+
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                                <span>Groundedness</span>
+                                <span style={{ fontWeight: 600 }}>{msg.eval_metrics.faithfulness}%</span>
+                              </div>
+                              <div style={{ height: 4, background: 'rgba(0,0,0,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${msg.eval_metrics.faithfulness}%`, background: COLORS.teal, borderRadius: 2 }} />
+                              </div>
+                            </div>
+
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                                <span>Answer Relevance</span>
+                                <span style={{ fontWeight: 600 }}>{msg.eval_metrics.answer_relevance}%</span>
+                              </div>
+                              <div style={{ height: 4, background: 'rgba(0,0,0,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${msg.eval_metrics.answer_relevance}%`, background: COLORS.teal, borderRadius: 2 }} />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ))}

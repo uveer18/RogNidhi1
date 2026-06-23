@@ -1,26 +1,64 @@
-**/venv/
+# Environments
+.env
+.env.local
+.env.production
+.env.development
+.env.staging
+venv/
+env/
+ENV/
+.venv/
+*/venv/
+*/env/
 
+# Python Cache & Build
 **/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+.egg-info/
+dist/
+build/
 
-**/.env
-
+# Node / JS
 **/node_modules/
+frontend/build/
+frontend/dist/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.parcel-cache
 
+# OS Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local databases
+db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+*.db
+
+# AI & RAG indexes
+*.faiss
+*.pkl
+
+# Project specific
+media/
+backend/media/
+staticfiles/
+backend/staticfiles/
+
+# Media Asset exceptions
 *.png
 !assets/*.png
 !assets/**/*.png
 *.jpg
 !assets/*.jpg
 !assets/**/*.jpg
-.vscode/
-
-*.faiss
-*.pkl
-
-# Database
-db.sqlite3
-*.sqlite3
-
-# Media/Uploads
-media/
-backend/media/

@@ -189,7 +189,7 @@ from .models import ChatSession, ChatMessage
 class ChatMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatMessage
-        fields = ['id', 'sender', 'text', 'created_at']
+        fields = ['id', 'sender', 'text', 'created_at', 'eval_metrics']
 
 class ChatSessionSerializer(serializers.ModelSerializer):
     messages = ChatMessageSerializer(many=True, read_only=True)
