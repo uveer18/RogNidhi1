@@ -24,6 +24,7 @@ RogNidhi acts as a singular treasury for all medical information, providing a se
 * **Live Health Schemes Scraper:** An integrated "Schemes" explorer that live-scrapes the latest Ayushman Bharat and national health subsidies dynamically from government repositories.
 * **Granular Access Control:** You retain complete ownership of your data. Temporarily grant and revoke access to specific doctors with a click.
 * **Real-Time Notifications:** Distinct audio pings and visual overlay badges instantly notify you when a doctor requests access.
+* **RAG Evaluation Metrics:** Displays real-time Retrieval Relevance, Faithfulness, and Answer Relevance metrics directly under each AI chatbot message, ensuring trust and grounded medical reasoning.
 
 #### 👨‍⚕️ For Doctors
 * **Instant Case Summaries:** Before a consultation begins, effortlessly receive an AI-generated clinical summary of the patient's entire medical history.
@@ -44,7 +45,7 @@ RogNidhi employs a hybrid Corrective Retrieval-Augmented Generation (cRAG) pipel
 ## 🛠 Tech Stack
 
 ### **Presentation / UI Layer**
-* **Framework:** React.js 19 + Vite
+* **Framework:** React.js 19 + Create React App (`react-scripts`)
 * **Language:** TypeScript
 * **Styling & UX:** Vanilla CSS, `framer-motion` (Fluid UI animations), `recharts` (Data visualization)
 * **Assets:** Lucide React (Dynamic iconography)
@@ -53,9 +54,10 @@ RogNidhi employs a hybrid Corrective Retrieval-Augmented Generation (cRAG) pipel
 * **Framework:** Django & Django REST Framework (DRF)
 * **Authentication:** JWT (JSON Web Tokens) `rest_framework_simplejwt`
 * **Scraping Layer:** `BeautifulSoup4` + `Requests` for real-time Wikipedia/Gov portal parsing
+* **Production Server:** Gunicorn, WhiteNoise (optimized static assets)
 
 ### **Data & DB Layer**
-* **Database:** SQLite (Development) / MySQL (Production)
+* **Database:** SQLite (Development) / PostgreSQL (Production)
 * **Storage:** Native Django File Storage (with cascading automated blob deletion)
 
 ### **AI & ML Layer**
@@ -137,7 +139,27 @@ cd frontend
 npm install
 npm run dev
 ```
-*The application UI will run at `http://localhost:5173`*
+*The application UI will run at `http://localhost:3000`*
+
+---
+
+## ☁️ Production Deployment
+
+### Frontend (Vercel)
+1. Link your repository `uveer18/RogNidhi1` on Vercel.
+2. Set the **Root Directory** to `frontend`.
+3. Configure the **Environment Variable**: `REACT_APP_API_URL` to point to your Render backend service.
+4. Deploy!
+
+### Backend (Render)
+1. Render automatically picks up the Blueprint config [render.yaml](file:///C:/Users/udayv/OneDrive/Desktop/p/RogNidhi/render.yaml) from your repository root.
+2. Link your repository in Render Blueprints.
+3. Configure these environment variables in your Web Service:
+   - `GROQ_API_KEY`, `GEMINI_API_KEY`, `NVIDIA_API_KEY`
+   - `SECRET_KEY` (Django secret key)
+   - `DEBUG` = `False`
+   - `ALLOWED_HOSTS` = your Render app domain (e.g. `rognidhi-backend.onrender.com`)
+4. Deploy! Render will auto-provision a PostgreSQL database and run migrations & static collection via [build.sh](file:///C:/Users/udayv/OneDrive/Desktop/p/RogNidhi/build.sh).
 
 ---
 
