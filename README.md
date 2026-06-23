@@ -147,8 +147,8 @@ npm run dev
 * **Wearable Integration:** Integrating Apple HealthKit & Google Fit data mapping directly into the UI.
 
 ---
-
-## 👥 Team TLE (NIT Jalandhar)
+(This forked repo contains work done by me, i.e. Udayveer Singh only)
+## 👥 Team TLE (NIT Jalandhar) (Originally)
 * **Yash Patel** - 2nd Year
 * **Aditya Soni** - 2nd Year
 * **Ashima Sood** - 2nd Year
