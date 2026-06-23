@@ -8,15 +8,7 @@ from .views import (
     PatientDocumentsForDoctorView, ScrapeSchemesView, NotificationListView, NotificationMarkReadView
 )
 
-from django.http import JsonResponse
-from django.urls import path, include
-
-def health(request):
-    return JsonResponse({"status": "ok"})
-
-
 urlpatterns = [
-    path("health/", health),
     path('auth/register/patient/', PatientRegisterView.as_view(), name='patient-register'),
     path('auth/register/doctor/',  DoctorRegisterView.as_view(), name='doctor-register'),
     path('auth/login/', LoginView.as_view(), name='login'),
